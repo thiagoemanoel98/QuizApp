@@ -14,7 +14,7 @@ export const data = [
     options: ['Alligator', 'Crocodile', 'Baboon', 'Hippo'],
     correct_option: 'Hippo',
   },
-  {
+  /*{
     question: 'What is the largest animal on Earth?',
     options: [
       'The African elephant',
@@ -28,5 +28,5 @@ export const data = [
     question: 'What is the only flying mammal?',
     options: ['The bat', 'The flying squirrel', 'The bald eagle', 'The colugo'],
     correct_option: 'The bat',
-  },
+  },*/
 ];

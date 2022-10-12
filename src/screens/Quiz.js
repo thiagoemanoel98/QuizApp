@@ -1,3 +1,4 @@
+/* eslint-disable react/self-closing-comp */
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
 
@@ -11,6 +12,7 @@ import {
   Image,
   Touchable,
   TouchableOpacity,
+  Modal,
 } from 'react-native';
 import {RFValue} from 'react-native-responsive-fontsize';
 import {COLORS, SIZES} from '../constants';
@@ -23,18 +25,36 @@ export function Quiz() {
   const [correctOption, setcorrectOption] = useState(null);
   const [isOptionsDisabled, setisOptionsDisabled] = useState(false);
   const [score, setScore] = useState(0);
+  const [showNextButton, setshowNextButton] = useState(false);
+  const [showScoreModal, setShowScoreModal] = useState(false);
 
   const validateAnswer = selectedOption => {
-    let correct_option = allQuestions[currentQuestionIndex]['correct_option'];
+    let correct_option = allQuestions[currentQuestionIndex].correct_option;
     setcurrentOptionSelected(selectedOption);
     setcorrectOption(correct_option);
     setisOptionsDisabled(true);
 
-    if (selectedOption === correctOption) {
+    if (selectedOption === correct_option) {
       // set score
+      console.log('acertei');
       setScore(score + 1);
     }
     // show Next Button
+    setshowNextButton(true);
+  };
+
+  const handleNext = () => {
+    if (currentQuestionIndex + 1 === allQuestions.length) {
+      //last question
+      // show score modal
+      setShowScoreModal(true);
+    } else {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+      setcurrentOptionSelected(null);
+      setcorrectOption(null);
+      setisOptionsDisabled(false);
+      setshowNextButton(false);
+    }
   };
 
   const renderQuestion = () => {
@@ -67,6 +87,17 @@ export function Quiz() {
         </Text>
       </View>
     );
+  };
+
+  const restartQuiz = () => {
+    setShowScoreModal(false);
+    setCurrentQuestionIndex(0);
+    setScore(0);
+
+    setcurrentOptionSelected(null);
+    setcorrectOption(null);
+    setisOptionsDisabled(false);
+    setshowNextButton(false);
   };
 
   const renderOptions = () => {
@@ -148,6 +179,33 @@ export function Quiz() {
     );
   };
 
+  const renderNextButton = () => {
+    if (showNextButton) {
+      return (
+        <TouchableOpacity
+          onPress={handleNext}
+          style={{
+            marginTop: 20,
+            width: '100%',
+            backgroundColor: COLORS.accent,
+            padding: 20,
+            borderRadius: 5,
+          }}>
+          <Text
+            style={{
+              fontSize: RFValue(16),
+              color: COLORS.white,
+              textAlign: 'center',
+            }}>
+            Next
+          </Text>
+        </TouchableOpacity>
+      );
+    } else {
+      return null;
+    }
+  };
+
   return (
     <SafeAreaView style={{flex: 1}}>
       <StatusBar barStyle={'light-content'} backgroundColor={COLORS.primary} />
@@ -168,6 +226,78 @@ export function Quiz() {
         {renderOptions()}
 
         {/** Next button */}
+        {renderNextButton()}
+
+        {/** Score Modal */}
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={showScoreModal}>
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: COLORS.primary,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+            <View
+              style={{
+                backgroundColor: COLORS.white,
+                width: '90%',
+                borderRadius: 20,
+                padding: 20,
+                alignItems: 'center',
+              }}>
+              <Text
+                style={{
+                  fontSize: RFValue(26),
+                  color: COLORS.black,
+                  fontWeight: 'bold',
+                }}>
+                {score > allQuestions.length / 2 ? 'Parabéns!' : 'Oops!'}
+              </Text>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'flex-start',
+                  alignItems: 'center',
+                  marginVertical: 20,
+                }}>
+                <Text
+                  style={{
+                    fontSize: RFValue(26),
+                    color:
+                      score > allQuestions.length / 2
+                        ? COLORS.success
+                        : COLORS.error,
+                  }}>
+                  {score}
+                </Text>
+                <Text style={{color: COLORS.black, fontSize: RFValue(16)}}>
+                  / {allQuestions.length}
+                </Text>
+              </View>
+              {/* Retry quiz button */}
+              <TouchableOpacity
+                onPress={restartQuiz}
+                style={{
+                  backgroundColor: COLORS.accent,
+                  padding: 20,
+                  width: '100%',
+                  borderRadius: 20,
+                }}>
+                <Text
+                  style={{
+                    textAlign: 'center',
+                    color: COLORS.white,
+                    fontSize: RFValue(16),
+                  }}>
+                  Tentar novamente
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
 
         {/** Background image */}
 
