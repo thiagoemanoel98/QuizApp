@@ -1,8 +1,10 @@
+/* eslint-disable no-lone-blocks */
 /* eslint-disable react/self-closing-comp */
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import * as Progress from 'react-native-progress';
 
 import {
   View,
@@ -10,15 +12,18 @@ import {
   SafeAreaView,
   StatusBar,
   Image,
-  Touchable,
+  useWindowDimensions,
   TouchableOpacity,
   Modal,
+  Animated,
 } from 'react-native';
 import {RFValue} from 'react-native-responsive-fontsize';
 import {COLORS, SIZES} from '../constants';
 import {data} from '../data/QuizData';
 
 export function Quiz() {
+  const {heightDevice, widthDevice} = useWindowDimensions();
+
   const allQuestions = data;
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [currentOptionSelected, setcurrentOptionSelected] = useState(null);
@@ -36,7 +41,6 @@ export function Quiz() {
 
     if (selectedOption === correct_option) {
       // set score
-      console.log('acertei');
       setScore(score + 1);
     }
     // show Next Button
@@ -55,11 +59,15 @@ export function Quiz() {
       setisOptionsDisabled(false);
       setshowNextButton(false);
     }
+
+    let percentProgress = (currentQuestionIndex + 1) / allQuestions.length;
+
+    setProgress(percentProgress);
   };
 
   const renderQuestion = () => {
     return (
-      <View>
+      <View style={{marginVertical: 40}}>
         {/* Question counter */}
         <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
           <Text
@@ -98,6 +106,8 @@ export function Quiz() {
     setcorrectOption(null);
     setisOptionsDisabled(false);
     setshowNextButton(false);
+
+    setProgress(0);
   };
 
   const renderOptions = () => {
@@ -206,6 +216,19 @@ export function Quiz() {
     }
   };
 
+  const [progress, setProgress] = useState(0);
+  const renderProgressBar = () => {
+    return (
+      <View
+        style={{
+          width: '100%',
+          backgroundColor: '#00000020',
+        }}>
+        <Progress.Bar progress={progress} width={null} height={12} />
+      </View>
+    );
+  };
+
   return (
     <SafeAreaView style={{flex: 1}}>
       <StatusBar barStyle={'light-content'} backgroundColor={COLORS.primary} />
@@ -218,6 +241,7 @@ export function Quiz() {
           position: 'relative',
         }}>
         {/** Progress bar */}
+        {renderProgressBar()}
 
         {/** Question */}
         {renderQuestion()}
