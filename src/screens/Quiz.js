@@ -224,7 +224,12 @@ export function Quiz() {
           width: '100%',
           backgroundColor: '#00000020',
         }}>
-        <Progress.Bar progress={progress} width={null} height={12} />
+        <Progress.Bar
+          progress={progress}
+          width={null}
+          height={12}
+          color={COLORS.accent}
+        />
       </View>
     );
   };
